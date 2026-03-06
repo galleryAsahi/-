@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍣 寿司タイピング道場</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Antique+Soft&family=M+PLUS+1p:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#c0392b;--deep:#7b241c;--gold:#d4ac0d;--gold2:#f0c030;
+  --cream:#fdf6e3;--dark:#1a0a00;--wood:#8b5e3c;--lwood:#c9956a;
+  --ink:#2c1810;--sh:rgba(192,57,43,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--cream);color:var(--ink);font-family:'M PLUS 1p',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(circle at 15% 15%,rgba(192,57,43,.06) 0%,transparent 45%),
+    radial-gradient(circle at 85% 85%,rgba(212,172,13,.08) 0%,transparent 45%),
+    repeating-linear-gradient(45deg,transparent,transparent 28px,rgba(139,94,60,.03) 28px,rgba(139,94,60,.03) 29px),
+    repeating-linear-gradient(-45deg,transparent,transparent 28px,rgba(139,94,60,.03) 28px,rgba(139,94,60,.03) 29px)}
+
+/* ===== HEADER ===== */
+header{width:100%;text-align:center;padding:16px 20px 10px;position:relative;z-index:1;border-bottom:3px double var(--lwood)}
+.logo{font-family:'Zen Antique Soft',serif;font-size:clamp(1.6rem,3.5vw,2.6rem);color:var(--red);letter-spacing:.12em;line-height:1}
+.logo small{font-size:.45em;color:var(--wood);display:block;letter-spacing:.3em;margin-top:2px}
+
+/* ===== STATS BAR ===== */
+.stats-bar{width:100%;background:var(--dark);padding:8px 16px;display:flex;gap:0;position:relative;z-index:1}
+.stat{flex:1;display:flex;flex-direction:column;align-items:center;padding:2px 4px;border-right:1px solid rgba(255,255,255,.08)}
+.stat:last-child{border-right:none}
+.stat-lbl{font-size:.52rem;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}
+.stat-val{font-size:1.25rem;font-weight:900;color:#fff;line-height:1.1;min-width:2ch;text-align:center}
+.stat-val.danger{color:#e74c3c;animation:blink .4s step-end infinite}
+@keyframes blink{50%{opacity:.3}}
+
+/* ===== LEVEL BAR ===== */
+.level-bar{width:100%;background:var(--dark);padding:6px 16px 8px;position:relative;z-index:1;border-bottom:1px solid rgba(255,255,255,.06)}
+.level-row{display:flex;align-items:center;gap:10px}
+.lv-label{font-size:.7rem;font-weight:900;letter-spacing:.15em;color:var(--gold);white-space:nowrap;min-width:80px}
+.lv-track{flex:1;height:10px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden;position:relative}
+.lv-fill{height:100%;border-radius:5px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.lv-badge{font-size:.62rem;font-weight:900;padding:2px 10px;border-radius:100px;color:white;letter-spacing:.12em;white-space:nowrap}
+.lv-next{font-size:.58rem;color:rgba(255,255,255,.4);white-space:nowrap}
+
+/* ===== MAIN ===== */
+main{width:100%;max-width:820px;padding:18px 16px 12px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:1;flex:1}
+
+/* ===== CONVEYOR ===== */
+.conveyor-wrap{width:100%;overflow:hidden;border-radius:9px;background:var(--dark);padding:4px;box-shadow:0 4px 20px var(--sh)}
+.cbelt{width:100%;height:44px;background:repeating-linear-gradient(90deg,#2c1810 0,#2c1810 36px,#3d261a 36px,#3d261a 46px);border-radius:6px;position:relative;overflow:hidden}
+.cbelt::before,.cbelt::after{content:'';position:absolute;top:0;bottom:0;width:20px;z-index:2}
+.cbelt::before{left:0;background:linear-gradient(90deg,var(--dark),transparent)}
+.cbelt::after{right:0;background:linear-gradient(270deg,var(--dark),transparent)}
+.sushi-row{position:absolute;top:50%;transform:translateY(-50%);display:flex;gap:24px;white-space:nowrap;padding:0 12px}
+.sushi-row.s1{animation:sf1 12s linear infinite}
+.sushi-row.s2{animation:sf2 18s linear infinite;top:50%}
+@keyframes sf1{from{left:100%}to{left:-600%}}
+@keyframes sf2{from{left:-20%}to{left:120%}}
+.se{font-size:1.8rem;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+
+/* ===== MODE TABS ===== */
+.mode-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.tab-btn{padding:7px 20px;border:2px solid var(--lwood);border-radius:100px;font-family:'M PLUS 1p',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.1em;cursor:pointer;background:transparent;color:var(--wood);transition:all .18s}
+.tab-btn:hover{border-color:var(--red);color:var(--red)}
+.tab-btn.active{background:var(--red);border-color:var(--red);color:white}
+
+/* ===== WORD STAGE ===== */
+.word-stage{width:100%;background:white;border:2px solid var(--lwood);border-radius:14px;padding:20px 20px 14px;box-shadow:0 2px 18px var(--sh);text-align:center;position:relative;transition:border-color .2s}
+.ws-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ws-cat{font-size:.6rem;color:#bbb;letter-spacing:.2em}
+.ws-lv-tag{font-size:.58rem;font-weight:900;padding:2px 8px;border-radius:100px;color:white;letter-spacing:.1em}
+.jp-word{font-family:'Zen Antique Soft',serif;font-size:clamp(2.2rem,5.5vw,3.4rem);color:var(--red);letter-spacing:.15em;line-height:1.1;margin-bottom:4px}
+.romaji-line{font-size:clamp(1.3rem,3vw,2rem);font-weight:700;letter-spacing:.08em;min-height:2.4rem;display:flex;justify-content:center;gap:0;flex-wrap:wrap;align-items:center}
+.rc{transition:color .06s;font-family:'M PLUS 1p',monospace}
+.rc.typed{color:var(--gold)}
+.rc.cur{color:var(--red);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:2px}
+.rc.rem{color:#d4cabb}
+.word-meaning{font-size:.75rem;color:#b0a090;margin-top:6px}
+.hint-text{font-size:.62rem;color:#c9956a;margin-top:3px;min-height:1em}
+.hint-text b{color:var(--red)}
+.prog-track{width:100%;height:4px;background:#ede5d8;border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--red));border-radius:2px;transition:width .07s}
+/* word timer (Lv6+) */
+.wtimer-track{width:100%;height:3px;background:#ffeedd;border-radius:2px;overflow:hidden;margin-top:3px}
+.wtimer-fill{height:100%;border-radius:2px;transition:width .1s linear}
+
+/* ===== LONG TEXT STAGE ===== */
+.long-stage{width:100%;background:white;border:2px solid var(--lwood);border-radius:14px;padding:20px 22px 16px;box-shadow:0 2px 18px var(--sh)}
+.long-title{font-size:.62rem;color:var(--wood);letter-spacing:.25em;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.long-title span{background:var(--red);color:white;padding:2px 8px;border-radius:4px;font-size:.58rem}
+/* paragraph display */
+.para-display{font-family:'Zen Antique Soft',serif;font-size:clamp(1.1rem,2.5vw,1.5rem);line-height:2.2;letter-spacing:.1em;color:var(--ink);text-align:left;margin-bottom:12px;position:relative}
+.para-display .pc{transition:color .05s}
+.para-display .pc.done{color:var(--gold)}
+.para-display .pc.act{color:var(--red);text-decoration:underline;text-underline-offset:3px}
+.para-display .pc.todo{color:#c8bfb0}
+.para-display .pc.space{color:#e0d8cc}
+/* romaji below */
+.long-romaji{font-size:clamp(.85rem,2vw,1.15rem);font-weight:700;letter-spacing:.06em;color:#888;line-height:1.8;text-align:left;margin-bottom:8px;word-break:break-all}
+.long-romaji .lrc.done{color:var(--gold)}
+.long-romaji .lrc.act{color:var(--red)}
+.long-romaji .lrc.todo{color:#ccc}
+/* long progress */
+.long-prog{width:100%;height:6px;background:#ede5d8;border-radius:3px;overflow:hidden}
+.long-prog-fill{height:100%;background:linear-gradient(90deg,#27ae60,var(--gold),var(--red));border-radius:3px;transition:width .1s}
+
+/* ===== INPUT WRAP (feedback only) ===== */
+.input-wrap{width:100%;position:relative;height:0}
+.word-stage.err{animation:stageShake .22s ease;border-color:#e74c3c!important}
+.word-stage.ok-flash{border-color:var(--gold)!important}
+.long-stage.err{animation:stageShake .22s ease;border-color:#e74c3c!important}
+.long-stage.ok-flash{border-color:var(--gold)!important}
+@keyframes stageShake{0%,100%{transform:translateX(0)}30%{transform:translateX(-6px)}70%{transform:translateX(6px)}}
+.fb{position:absolute;top:-38px;left:50%;transform:translateX(-50%);font-size:1rem;font-weight:900;pointer-events:none;animation:fbUp .6s ease forwards;white-space:nowrap;z-index:10}
+@keyframes fbUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-24px)}}
+
+/* ===== COMBO ===== */
+.combo-wrap{position:fixed;top:120px;right:16px;text-align:center;pointer-events:none;z-index:50;display:none}
+.combo-n{font-size:2.2rem;font-weight:900;color:var(--red);line-height:1;text-shadow:0 2px 8px rgba(192,57,43,.35)}
+.combo-l{font-size:.6rem;letter-spacing:.25em;color:var(--gold);font-weight:700}
+@keyframes cp{0%{transform:scale(1.4)}100%{transform:scale(1)}}
+
+/* ===== OVERLAYS ===== */
+.overlay{position:fixed;inset:0;background:rgba(20,8,0,.92);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;overflow-y:auto}
+.ocard{background:var(--cream);border:3px double var(--gold);border-radius:20px;padding:32px 40px;text-align:center;max-width:520px;width:100%;box-shadow:0 10px 50px rgba(0,0,0,.5);position:relative}
+.ocard::before{content:'🍣';font-size:2.8rem;display:block;margin-bottom:8px}
+.otitle{font-family:'Zen Antique Soft',serif;font-size:1.9rem;color:var(--red);margin-bottom:6px}
+.osub{font-size:.82rem;color:var(--wood);letter-spacing:.15em;margin-bottom:20px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.ri{background:white;border:1px solid #e8dfd0;border-radius:10px;padding:10px}
+.rl{font-size:.6rem;color:var(--wood);letter-spacing:.15em}
+.rv{font-size:1.35rem;font-weight:900;color:var(--red)}
+.btn{background:var(--red);color:white;border:none;padding:11px 30px;font-family:'M PLUS 1p',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.18em;border-radius:8px;cursor:pointer;transition:all .15s;margin:4px}
+.btn:hover{background:var(--deep);transform:translateY(-2px)}
+.btn.sec{background:transparent;border:2px solid var(--lwood);color:var(--wood)}
+.btn.sec:hover{background:var(--lwood);color:white}
+
+/* start screen */
+.level-picker{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:20px}
+.lp-btn{width:70px;height:70px;border:2px solid;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .18s;background:transparent;font-family:'M PLUS 1p',sans-serif}
+.lp-btn:hover,.lp-btn.sel{transform:translateY(-2px)}
+.lp-n{font-size:1.3rem;font-weight:900}
+.lp-tag{font-size:.5rem;font-weight:700;letter-spacing:.08em;margin-top:1px}
+.start-mode-row{display:flex;gap:10px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+.smr-btn{padding:10px 22px;border:2px solid var(--lwood);border-radius:10px;background:transparent;font-family:'M PLUS 1p',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--wood);transition:all .18s;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:130px}
+.smr-btn:hover,.smr-btn.sel{background:var(--red);border-color:var(--red);color:white}
+.smr-icon{font-size:1.5rem}
+.smr-lbl{font-size:.75rem;letter-spacing:.1em;font-weight:900}
+.smr-desc{font-size:.6rem;opacity:.8}
+
+/* level up flash */
+.lvup-flash{position:fixed;inset:0;pointer-events:none;z-index:300;display:flex;align-items:center;justify-content:center;opacity:0}
+.lvup-inner{font-family:'Zen Antique Soft',serif;font-size:3rem;color:var(--gold2);text-shadow:0 0 30px var(--gold),0 0 60px rgba(212,172,13,.5);letter-spacing:.2em;transform:scale(.5)}
+@keyframes lvup{0%{opacity:0}20%{opacity:1;transform:scale(1.1)}50%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1.2)}}
+
+.hint-bar{width:100%;text-align:center;padding:8px;font-size:.64rem;color:var(--wood);letter-spacing:.12em;border-top:1px solid #e8dfd0;position:relative;z-index:1}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">寿司タイピング道場<small>SUSHI TYPING DOJO</small></div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-lbl">スコア</div><div class="stat-val" id="score">0</div></div>
+  <div class="stat"><div class="stat-lbl">正解</div><div class="stat-val" id="correct">0</div></div>
+  <div class="stat"><div class="stat-lbl">ミス</div><div class="stat-val" id="miss">0</div></div>
+  <div class="stat"><div class="stat-lbl">残り</div><div class="stat-val" id="timer">60</div></div>
+  <div class="stat"><div class="stat-lbl">打鍵/秒</div><div class="stat-val" id="wpm">0</div></div>
+  <div class="stat"><div class="stat-lbl">精度</div><div class="stat-val" id="accuracy">-</div></div>
+</div>
+
+<div class="level-bar">
+  <div class="level-row">
+    <div class="lv-label" id="lv-label">Lv.1 入門</div>
+    <div class="lv-track"><div class="lv-fill" id="lv-fill" style="width:0%"></div></div>
+    <div class="lv-badge" id="lv-badge">🌱</div>
+    <div class="lv-next" id="lv-next">次まで 100pt</div>
+  </div>
+</div>
+
+<main>
+  <div class="conveyor-wrap">
+    <div class="cbelt">
+      <div class="sushi-row s1">
+        <span class="se">🍣</span><span class="se">🍱</span><span class="se">🥢</span><span class="se">🍤</span><span class="se">🍙</span><span class="se">🐟</span><span class="se">🦐</span><span class="se">🍣</span><span class="se">🥟</span><span class="se">🎋</span><span class="se">🍚</span><span class="se">🦑</span><span class="se">🫙</span><span class="se">🍜</span><span class="se">🍣</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mode-tabs">
+    <button class="tab-btn active" onclick="setGameMode('word')" id="tab-word">🍣 単語モード</button>
+    <button class="tab-btn" onclick="setGameMode('long')" id="tab-long">📜 長文モード</button>
+  </div>
+
+  <!-- WORD MODE -->
+  <div id="word-area">
+    <div class="word-stage" id="word-stage">
+      <div class="ws-top">
+        <div class="ws-cat" id="ws-cat">カテゴリ</div>
+        <div class="ws-lv-tag" id="ws-lv-tag">Lv.1</div>
+      </div>
+      <div class="jp-word" id="jp-word">まぐろ</div>
+      <div class="romaji-line" id="romaji-line"></div>
+      <div class="hint-text" id="hint-text"></div>
+      <div class="word-meaning" id="word-meaning">マグロ（tuna）</div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="wtimer-track hidden" id="wtimer-track"><div class="wtimer-fill" id="wtimer-fill" style="width:100%"></div></div>
+    </div>
+  </div>
+
+  <!-- LONG TEXT MODE -->
+  <div id="long-area" class="hidden">
+    <div class="long-stage">
+      <div class="long-title">
+        <span id="long-title-txt">長文タイピング</span>
+        <span id="long-badge">Lv.1</span>
+      </div>
+      <div class="para-display" id="para-display"></div>
+      <div class="long-romaji" id="long-romaji"></div>
+      <div class="long-prog"><div class="long-prog-fill" id="long-prog-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="input-wrap" id="input-wrap"></div>
+</main>
+
+<div class="hint-bar" id="hint-bar">Enterでスキップ　・　ESCでメニュー　・　ヘボン式／訓令式／IME式対応</div>
+
+<div class="combo-wrap" id="combo-wrap">
+  <div class="combo-n" id="combo-n">1x</div>
+  <div class="combo-l">COMBO</div>
+</div>
+
+<div class="lvup-flash" id="lvup-flash">
+  <div class="lvup-inner" id="lvup-inner">LEVEL UP!</div>
+</div>
+
+<!-- START OVERLAY -->
+<div class="overlay" id="start-overlay">
+  <div class="ocard" style="max-width:600px">
+    <div class="otitle">寿司タイピング道場</div>
+    <div class="osub">レベルを選んでスタート！</div>
+
+    <div style="font-size:.72rem;color:var(--wood);margin-bottom:12px;letter-spacing:.08em">── レベル選択（1〜10）──</div>
+    <div class="level-picker" id="level-picker"></div>
+
+    <div style="font-size:.72rem;color:var(--wood);margin-bottom:10px;letter-spacing:.08em">── ゲームモード ──</div>
+    <div class="start-mode-row">
+      <button class="smr-btn sel" id="smr-word" onclick="selectStartMode('word')">
+        <span class="smr-icon">🍣</span>
+        <span class="smr-lbl">単語モード</span>
+        <span class="smr-desc">60秒で単語をどんどん打つ</span>
+      </button>
+      <button class="smr-btn" id="smr-long" onclick="selectStartMode('long')">
+        <span class="smr-icon">📜</span>
+        <span class="smr-lbl">長文モード</span>
+        <span class="smr-desc">文章をまるごとタイピング</span>
+      </button>
+    </div>
+
+    <p style="font-size:.78rem;color:#777;line-height:1.8;margin-bottom:18px">
+      🌱 Lv.1〜3：ひらがな短め・ヒントあり（60秒）<br>
+      🍣 Lv.4〜6：単語長め・単語タイマーON（60〜75秒）<br>
+      🔥 Lv.7〜9：長文・ヒントなし・高速要求（90秒）<br>
+      👑 Lv.10：最難関・全カテゴリ・180秒
+    </p>
+    <button class="btn" onclick="startGame()">スタート！</button>
+  </div>
+</div>
+
+<!-- RESULT OVERLAY -->
+<div class="overlay hidden" id="result-overlay">
+  <div class="ocard">
+    <div class="otitle" id="r-title">お疲れ様！</div>
+    <div class="osub" id="r-rank">ランク</div>
+    <div class="rgrid">
+      <div class="ri"><div class="rl">スコア</div><div class="rv" id="r-score">0</div></div>
+      <div class="ri"><div class="rl">正解単語</div><div class="rv" id="r-correct">0</div></div>
+      <div class="ri"><div class="rl">正解文字数</div><div class="rv" id="r-chars">0</div></div>
+      <div class="ri"><div class="rl">打鍵/秒</div><div class="rv" id="r-wpm">0</div></div>
+      <div class="ri"><div class="rl">精度</div><div class="rv" id="r-acc">-</div></div>
+      <div class="ri"><div class="rl">最大コンボ</div><div class="rv" id="r-combo">0</div></div>
+    </div>
+    <div style="margin-bottom:14px">
+      <button class="btn" onclick="resetGame()">もう一度！</button>
+      <button class="btn sec" onclick="goStart()">レベル変更</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================================================
+//  ROMAJI ENGINE
+// ===================================================
+const KM = {
+  'あ':['a'],'い':['i'],'う':['u'],'え':['e'],'お':['o'],
+  'か':['ka','ca'],'き':['ki'],'く':['ku','cu'],'け':['ke'],'こ':['ko','co'],
+  'きゃ':['kya'],'きゅ':['kyu'],'きょ':['kyo'],
+  'さ':['sa'],'し':['si','shi','ci'],'す':['su'],'せ':['se','ce'],'そ':['so'],
+  'しゃ':['sya','sha'],'しゅ':['syu','shu'],'しょ':['syo','sho'],
+  'た':['ta'],'ち':['ti','chi'],'つ':['tu','tsu'],'て':['te'],'と':['to'],
+  'ちゃ':['tya','cha','cya'],'ちゅ':['tyu','chu','cyu'],'ちょ':['tyo','cho','cyo'],
+  'てぃ':['thi'],'とぅ':['twu'],
+  'な':['na'],'に':['ni'],'ぬ':['nu'],'ね':['ne'],'の':['no'],
+  'にゃ':['nya'],'にゅ':['nyu'],'にょ':['nyo'],
+  'は':['ha'],'ひ':['hi'],'ふ':['hu','fu'],'へ':['he'],'ほ':['ho'],
+  'ひゃ':['hya'],'ひゅ':['hyu'],'ひょ':['hyo'],
+  'ふぁ':['fa','fwa'],'ふぃ':['fi'],'ふぇ':['fe'],'ふぉ':['fo'],
+  'ま':['ma'],'み':['mi'],'む':['mu'],'め':['me'],'も':['mo'],
+  'みゃ':['mya'],'みゅ':['myu'],'みょ':['myo'],
+  'や':['ya'],'ゆ':['yu'],'よ':['yo'],
+  'ら':['ra'],'り':['ri'],'る':['ru'],'れ':['re'],'ろ':['ro'],
+  'りゃ':['rya'],'りゅ':['ryu'],'りょ':['ryo'],
+  'わ':['wa'],'ゐ':['wi'],'ゑ':['we'],'を':['wo'],
+  'が':['ga'],'ぎ':['gi'],'ぐ':['gu'],'げ':['ge'],'ご':['go'],
+  'ぎゃ':['gya'],'ぎゅ':['gyu'],'ぎょ':['gyo'],
+  'ざ':['za'],'じ':['zi','ji'],'ず':['zu'],'ぜ':['ze'],'ぞ':['zo'],
+  'じゃ':['zya','ja','jya'],'じゅ':['zyu','ju','jyu'],'じょ':['zyo','jo','jyo'],
+  'だ':['da'],'ぢ':['di'],'づ':['du'],'で':['de'],'ど':['do'],
+  'でぃ':['dhi'],'どぅ':['dwu'],
+  'ば':['ba'],'び':['bi'],'ぶ':['bu'],'べ':['be'],'ぼ':['bo'],
+  'びゃ':['bya'],'びゅ':['byu'],'びょ':['byo'],
+  'ぱ':['pa'],'ぴ':['pi'],'ぷ':['pu'],'ぺ':['pe'],'ぽ':['po'],
+  'ぴゃ':['pya'],'ぴゅ':['pyu'],'ぴょ':['pyo'],
+  'ぁ':['la','xa'],'ぃ':['li','xi'],'ぅ':['lu','xu'],'ぇ':['le','xe'],'ぉ':['lo','xo'],
+  'っ':['ltu','xtu'],'ゃ':['lya','xya'],'ゅ':['lyu','xyu'],'ょ':['lyo','xyo'],
+  'ー':['-'],'。':['.'],'、':[','],
+  ' ':['　',' '],'　':['　',' '],
+};
+
+function kanaToMoras(kana) {
+  const res = [];
+  let i = 0;
+  while (i < kana.length) {
+    // 2-char combo first
+    if (i+1 < kana.length && KM[kana[i]+kana[i+1]]) {
+      res.push({k:kana[i]+kana[i+1], p:[...KM[kana[i]+kana[i+1]]]});
+      i+=2; continue;
+    }
+    const c = kana[i];
+    if (c === 'っ') {
+      // っ: accept only the doubled consonant as a SINGLE char mora
+      // e.g. っこ → mora 'k' (just one k), then next mora 'ko'
+      if (i+1 < kana.length) {
+        const nk2 = i+2 < kana.length ? kana[i+1]+kana[i+2] : null;
+        const np = (nk2 && KM[nk2]) ? KM[nk2] : (KM[kana[i+1]] || []);
+        // Take the first consonant of each pattern variant
+        const singles = [...new Set(
+          np.map(p => p[0]).filter(ch => /[bcdfghjklmnpqrstvwxyz]/.test(ch))
+        )];
+        if (singles.length) {
+          res.push({k:c, p: singles}); // e.g. ['k'] or ['s','t'] etc
+        } else {
+          res.push({k:c, p:['ltu','xtu']});
+        }
+      } else {
+        res.push({k:c, p:['ltu','xtu']});
+      }
+    } else if (c === 'ん') {
+      res.push({k:c, p:['nn','n'], sn:true});
+    } else if (KM[c]) {
+      res.push({k:c, p:[...KM[c]]});
+    } else {
+      res.push({k:c, p:[c]});
+    }
+    i++;
+  }
+  return res;
+}
+
+// ===================================================
+//  10-LEVEL DEFINITIONS
+//  minLen/maxLen = reading文字数の範囲
+//  wordTimer/timerMult = 単語タイマー速さ
+// ===================================================
+const LEVELS = [
+  {n:1,  name:'入門',   icon:'🌱', col:'#7f8c8d', timeLimit:60,  wordTimer:false, showHint:true,  minLen:1, maxLen:2,  longDiff:1},
+  {n:2,  name:'見習い', icon:'🥢', col:'#27ae60', timeLimit:60,  wordTimer:false, showHint:true,  minLen:2, maxLen:3,  longDiff:1},
+  {n:3,  name:'初段',   icon:'🍱', col:'#16a085', timeLimit:60,  wordTimer:false, showHint:true,  minLen:2, maxLen:4,  longDiff:1},
+  {n:4,  name:'二段',   icon:'🐟', col:'#2980b9', timeLimit:60,  wordTimer:true,  showHint:true,  minLen:3, maxLen:5,  longDiff:2, timerMult:1.0},
+  {n:5,  name:'三段',   icon:'🦐', col:'#1a6fa5', timeLimit:75,  wordTimer:true,  showHint:true,  minLen:3, maxLen:6,  longDiff:2, timerMult:1.0},
+  {n:6,  name:'四段',   icon:'🍣', col:'#8e44ad', timeLimit:75,  wordTimer:true,  showHint:false, minLen:4, maxLen:7,  longDiff:2, timerMult:0.9},
+  {n:7,  name:'五段',   icon:'⚡', col:'#6c3483', timeLimit:90,  wordTimer:true,  showHint:false, minLen:5, maxLen:9,  longDiff:3, timerMult:0.8},
+  {n:8,  name:'六段',   icon:'🔥', col:'#e67e22', timeLimit:90,  wordTimer:true,  showHint:false, minLen:5, maxLen:11, longDiff:3, timerMult:0.7},
+  {n:9,  name:'七段',   icon:'⭐', col:'#ca6f1e', timeLimit:90,  wordTimer:true,  showHint:false, minLen:6, maxLen:99, longDiff:3, timerMult:0.6},
+  {n:10, name:'名人',   icon:'👑', col:'#c0392b', timeLimit:180, wordTimer:true,  showHint:false, minLen:6, maxLen:99, longDiff:3, timerMult:0.5},
+];
+
+function getLvDef(n) { return LEVELS[Math.min(Math.max(n,1),10)-1]; }
+
+// ===================================================
+//  WORD DATA (300 words)
+// ===================================================
+const WORDS = [
+  // 🍣 寿司・海鮮
+  {jp:'まぐろ',r:'まぐろ',m:'マグロ（tuna）',c:'🍣 寿司',d:1},
+  {jp:'さけ',r:'さけ',m:'サーモン（salmon）',c:'🍣 寿司',d:1},
+  {jp:'えび',r:'えび',m:'エビ（shrimp）',c:'🍣 寿司',d:1},
+  {jp:'いか',r:'いか',m:'イカ（squid）',c:'🍣 寿司',d:1},
+  {jp:'たこ',r:'たこ',m:'タコ（octopus）',c:'🍣 寿司',d:1},
+  {jp:'うに',r:'うに',m:'ウニ（sea urchin）',c:'🍣 寿司',d:1},
+  {jp:'いくら',r:'いくら',m:'イクラ（salmon roe）',c:'🍣 寿司',d:1},
+  {jp:'あじ',r:'あじ',m:'アジ（horse mackerel）',c:'🍣 寿司',d:1},
+  {jp:'かに',r:'かに',m:'カニ（crab）',c:'🍣 寿司',d:1},
+  {jp:'のり',r:'のり',m:'海苔（nori）',c:'🍣 寿司',d:1},
+  {jp:'ひらめ',r:'ひらめ',m:'ヒラメ（flounder）',c:'🍣 寿司',d:2},
+  {jp:'かつお',r:'かつお',m:'カツオ（bonito）',c:'🍣 寿司',d:2},
+  {jp:'ほたて',r:'ほたて',m:'ホタテ（scallop）',c:'🍣 寿司',d:2},
+  {jp:'あなご',r:'あなご',m:'アナゴ（sea eel）',c:'🍣 寿司',d:2},
+  {jp:'たまご',r:'たまご',m:'玉子焼き（egg）',c:'🍣 寿司',d:2},
+  {jp:'はまち',r:'はまち',m:'ハマチ（yellowtail）',c:'🍣 寿司',d:2},
+  {jp:'あわび',r:'あわび',m:'アワビ（abalone）',c:'🍣 寿司',d:2},
+  {jp:'しらす',r:'しらす',m:'シラス（whitebait）',c:'🍣 寿司',d:2},
+  {jp:'さわら',r:'さわら',m:'サワラ（Spanish mackerel）',c:'🍣 寿司',d:2},
+  {jp:'ふぐ',r:'ふぐ',m:'フグ（pufferfish）',c:'🍣 寿司',d:1},
+  {jp:'すし',r:'すし',m:'寿司（sushi）',c:'🍣 寿司',d:1},
+  {jp:'さしみ',r:'さしみ',m:'刺身（sashimi）',c:'🍣 寿司',d:2},
+  {jp:'しゃり',r:'しゃり',m:'シャリ（sushi rice）',c:'🍣 寿司',d:2},
+  {jp:'わさび',r:'わさび',m:'ワサビ（wasabi）',c:'🍣 寿司',d:2},
+  {jp:'がり',r:'がり',m:'ガリ（pickled ginger）',c:'🍣 寿司',d:1},
+  {jp:'ねた',r:'ねた',m:'ネタ（topping）',c:'🍣 寿司',d:1},
+  {jp:'うなぎ',r:'うなぎ',m:'ウナギ（eel）',c:'🍣 寿司',d:2},
+  {jp:'あさり',r:'あさり',m:'アサリ（clam）',c:'🍣 寿司',d:2},
+  {jp:'かき',r:'かき',m:'カキ（oyster）',c:'🍣 寿司',d:1},
+  {jp:'さんま',r:'さんま',m:'サンマ（Pacific saury）',c:'🍣 寿司',d:2},
+  {jp:'いわし',r:'いわし',m:'イワシ（sardine）',c:'🍣 寿司',d:2},
+  {jp:'あかみ',r:'あかみ',m:'赤身（lean tuna）',c:'🍣 寿司',d:2},
+  {jp:'まきずし',r:'まきずし',m:'巻き寿司（roll）',c:'🍣 寿司',d:3},
+  {jp:'てまきずし',r:'てまきずし',m:'手巻き寿司（hand roll）',c:'🍣 寿司',d:3},
+  {jp:'ねぎとろ',r:'ねぎとろ',m:'ネギトロ（tuna & onion）',c:'🍣 寿司',d:2},
+  {jp:'えんがわ',r:'えんがわ',m:'エンガワ（flounder fin）',c:'🍣 寿司',d:2},
+  {jp:'おおとろ',r:'おおとろ',m:'大トロ（fatty tuna belly）',c:'🍣 寿司',d:3},
+  {jp:'ちゅうとろ',r:'ちゅうとろ',m:'中トロ（medium fatty tuna）',c:'🍣 寿司',d:3},
+  {jp:'おまかせ',r:'おまかせ',m:'おまかせ（chef\'s choice）',c:'🍣 寿司',d:2},
+  {jp:'しめさば',r:'しめさば',m:'しめ鯖（marinated mackerel）',c:'🍣 寿司',d:3},
+  {jp:'こはだ',r:'こはだ',m:'コハダ（gizzard shad）',c:'🍣 寿司',d:3},
+  {jp:'さより',r:'さより',m:'サヨリ（halfbeak）',c:'🍣 寿司',d:3},
+  {jp:'かずのこ',r:'かずのこ',m:'数の子（herring roe）',c:'🍣 寿司',d:3},
+  {jp:'みるがい',r:'みるがい',m:'ミル貝（geoduck）',c:'🍣 寿司',d:3},
+  {jp:'つぶがい',r:'つぶがい',m:'ツブ貝（whelk）',c:'🍣 寿司',d:3},
+  {jp:'ぼたんえび',r:'ぼたんえび',m:'ボタン海老（spot prawn）',c:'🍣 寿司',d:3},
+  {jp:'しじみ',r:'しじみ',m:'シジミ（freshwater clam）',c:'🍣 寿司',d:3},
+  {jp:'このわた',r:'このわた',m:'海鼠腸（sea cucumber entrails）',c:'🍣 寿司',d:3},
+  {jp:'しょうゆ',r:'しょうゆ',m:'醤油（soy sauce）',c:'🍣 寿司',d:2},
+  {jp:'はなまき',r:'はなまき',m:'花巻き（flower roll）',c:'🍣 寿司',d:3},
+  // 🍜 食べ物
+  {jp:'うどん',r:'うどん',m:'うどん（udon）',c:'🍜 食べ物',d:1},
+  {jp:'そば',r:'そば',m:'蕎麦（soba）',c:'🍜 食べ物',d:1},
+  {jp:'もち',r:'もち',m:'餅（rice cake）',c:'🍜 食べ物',d:1},
+  {jp:'なべ',r:'なべ',m:'鍋（hot pot）',c:'🍜 食べ物',d:1},
+  {jp:'だんご',r:'だんご',m:'団子（dango）',c:'🍜 食べ物',d:2},
+  {jp:'おでん',r:'おでん',m:'おでん（oden）',c:'🍜 食べ物',d:2},
+  {jp:'とうふ',r:'とうふ',m:'豆腐（tofu）',c:'🍜 食べ物',d:2},
+  {jp:'なっとう',r:'なっとう',m:'納豆（natto）',c:'🍜 食べ物',d:2},
+  {jp:'ごぼう',r:'ごぼう',m:'牛蒡（burdock）',c:'🍜 食べ物',d:2},
+  {jp:'ちくわ',r:'ちくわ',m:'竹輪（fishcake）',c:'🍜 食べ物',d:2},
+  {jp:'てんぷら',r:'てんぷら',m:'天ぷら（tempura）',c:'🍜 食べ物',d:2},
+  {jp:'ようかん',r:'ようかん',m:'羊羹（yokan jelly）',c:'🍜 食べ物',d:2},
+  {jp:'せんべい',r:'せんべい',m:'煎餅（rice cracker）',c:'🍜 食べ物',d:3},
+  {jp:'らーめん',r:'らーめん',m:'ラーメン（ramen）',c:'🍜 食べ物',d:2},
+  {jp:'とんかつ',r:'とんかつ',m:'とんかつ（pork cutlet）',c:'🍜 食べ物',d:3},
+  {jp:'やきとり',r:'やきとり',m:'焼き鳥（grilled chicken）',c:'🍜 食べ物',d:3},
+  {jp:'おにぎり',r:'おにぎり',m:'おにぎり（rice ball）',c:'🍜 食べ物',d:3},
+  {jp:'たこやき',r:'たこやき',m:'たこ焼き（takoyaki）',c:'🍜 食べ物',d:3},
+  {jp:'おこのみやき',r:'おこのみやき',m:'お好み焼き（okonomiyaki）',c:'🍜 食べ物',d:3},
+  {jp:'みそしる',r:'みそしる',m:'味噌汁（miso soup）',c:'🍜 食べ物',d:3},
+  {jp:'すきやき',r:'すきやき',m:'すき焼き（sukiyaki）',c:'🍜 食べ物',d:3},
+  {jp:'しゃぶしゃぶ',r:'しゃぶしゃぶ',m:'しゃぶしゃぶ（shabu-shabu）',c:'🍜 食べ物',d:3},
+  {jp:'にんじん',r:'にんじん',m:'ニンジン（carrot）',c:'🍜 食べ物',d:3},
+  {jp:'たまねぎ',r:'たまねぎ',m:'玉ねぎ（onion）',c:'🍜 食べ物',d:3},
+  {jp:'じゃがいも',r:'じゃがいも',m:'じゃがいも（potato）',c:'🍜 食べ物',d:3},
+  {jp:'しいたけ',r:'しいたけ',m:'椎茸（shiitake）',c:'🍜 食べ物',d:3},
+  {jp:'たけのこ',r:'たけのこ',m:'竹の子（bamboo shoot）',c:'🍜 食べ物',d:3},
+  {jp:'れんこん',r:'れんこん',m:'蓮根（lotus root）',c:'🍜 食べ物',d:3},
+  {jp:'わらびもち',r:'わらびもち',m:'わらび餅（bracken mochi）',c:'🍜 食べ物',d:3},
+  {jp:'どらやき',r:'どらやき',m:'どら焼き（dorayaki）',c:'🍜 食べ物',d:3},
+  {jp:'いちごだいふく',r:'いちごだいふく',m:'いちご大福（strawberry mochi）',c:'🍜 食べ物',d:3},
+  {jp:'かまぼこ',r:'かまぼこ',m:'蒲鉾（fish cake）',c:'🍜 食べ物',d:3},
+  {jp:'はんぺん',r:'はんぺん',m:'はんぺん（fluffy fishcake）',c:'🍜 食べ物',d:3},
+  {jp:'こんにゃく',r:'こんにゃく',m:'こんにゃく（konjac）',c:'🍜 食べ物',d:3},
+  {jp:'おはぎ',r:'おはぎ',m:'おはぎ（sweet rice ball）',c:'🍜 食べ物',d:2},
+  {jp:'ぜんざい',r:'ぜんざい',m:'善哉（sweet bean soup）',c:'🍜 食べ物',d:3},
+  {jp:'あんみつ',r:'あんみつ',m:'あんみつ（anmitsu）',c:'🍜 食べ物',d:3},
+  {jp:'みたらしだんご',r:'みたらしだんご',m:'みたらし団子（sweet dumplings）',c:'🍜 食べ物',d:3},
+  {jp:'こんぶ',r:'こんぶ',m:'昆布（kombu）',c:'🍜 食べ物',d:2},
+  {jp:'わかめ',r:'わかめ',m:'わかめ（wakame）',c:'🍜 食べ物',d:3},
+  {jp:'とうがらし',r:'とうがらし',m:'唐辛子（chili pepper）',c:'🍜 食べ物',d:3},
+  {jp:'さつまあげ',r:'さつまあげ',m:'薩摩揚げ（fried fishcake）',c:'🍜 食べ物',d:3},
+  {jp:'ちゃんこなべ',r:'ちゃんこなべ',m:'ちゃんこ鍋（sumo stew）',c:'🍜 食べ物',d:3},
+  {jp:'やきそば',r:'やきそば',m:'焼きそば（fried noodles）',c:'🍜 食べ物',d:3},
+  {jp:'まっちゃ',r:'まっちゃ',m:'抹茶（matcha）',c:'🍜 食べ物',d:2},
+  {jp:'おちゃ',r:'おちゃ',m:'お茶（green tea）',c:'🍜 食べ物',d:1},
+  {jp:'くずもち',r:'くずもち',m:'葛餅（arrowroot cake）',c:'🍜 食べ物',d:3},
+  {jp:'かりんとう',r:'かりんとう',m:'花林糖（fried dough snack）',c:'🍜 食べ物',d:3},
+  {jp:'あぶらげ',r:'あぶらげ',m:'油揚げ（fried tofu）',c:'🍜 食べ物',d:3},
+  {jp:'もちこめ',r:'もちごめ',m:'もち米（glutinous rice）',c:'🍜 食べ物',d:3},
+  {jp:'こうやどうふ',r:'こうやどうふ',m:'高野豆腐（freeze-dried tofu）',c:'🍜 食べ物',d:3},
+  // 🌸 自然・動物
+  {jp:'いぬ',r:'いぬ',m:'犬（dog）',c:'🌸 自然',d:1},
+  {jp:'ねこ',r:'ねこ',m:'猫（cat）',c:'🌸 自然',d:1},
+  {jp:'くま',r:'くま',m:'熊（bear）',c:'🌸 自然',d:1},
+  {jp:'とら',r:'とら',m:'虎（tiger）',c:'🌸 自然',d:1},
+  {jp:'ぞう',r:'ぞう',m:'象（elephant）',c:'🌸 自然',d:1},
+  {jp:'はな',r:'はな',m:'花（flower）',c:'🌸 自然',d:1},
+  {jp:'そら',r:'そら',m:'空（sky）',c:'🌸 自然',d:1},
+  {jp:'うみ',r:'うみ',m:'海（ocean）',c:'🌸 自然',d:1},
+  {jp:'やま',r:'やま',m:'山（mountain）',c:'🌸 自然',d:1},
+  {jp:'かわ',r:'かわ',m:'川（river）',c:'🌸 自然',d:1},
+  {jp:'つき',r:'つき',m:'月（moon）',c:'🌸 自然',d:1},
+  {jp:'ほし',r:'ほし',m:'星（star）',c:'🌸 自然',d:1},
+  {jp:'あめ',r:'あめ',m:'雨（rain）',c:'🌸 自然',d:1},
+  {jp:'ゆき',r:'ゆき',m:'雪（snow）',c:'🌸 自然',d:1},
+  {jp:'かぜ',r:'かぜ',m:'風（wind）',c:'🌸 自然',d:1},
+  {jp:'さくら',r:'さくら',m:'桜（cherry blossom）',c:'🌸 自然',d:2},
+  {jp:'もみじ',r:'もみじ',m:'紅葉（autumn leaves）',c:'🌸 自然',d:2},
+  {jp:'うさぎ',r:'うさぎ',m:'兎（rabbit）',c:'🌸 自然',d:2},
+  {jp:'きつね',r:'きつね',m:'狐（fox）',c:'🌸 自然',d:3},
+  {jp:'たぬき',r:'たぬき',m:'狸（raccoon dog）',c:'🌸 自然',d:3},
+  {jp:'きりん',r:'きりん',m:'麒麟（giraffe）',c:'🌸 自然',d:2},
+  {jp:'らいおん',r:'らいおん',m:'ライオン（lion）',c:'🌸 自然',d:3},
+  {jp:'ぱんだ',r:'ぱんだ',m:'パンダ（panda）',c:'🌸 自然',d:2},
+  {jp:'おおかみ',r:'おおかみ',m:'狼（wolf）',c:'🌸 自然',d:3},
+  {jp:'いのしし',r:'いのしし',m:'猪（wild boar）',c:'🌸 自然',d:3},
+  {jp:'からす',r:'からす',m:'烏（crow）',c:'🌸 自然',d:2},
+  {jp:'ふくろう',r:'ふくろう',m:'梟（owl）',c:'🌸 自然',d:3},
+  {jp:'くじら',r:'くじら',m:'鯨（whale）',c:'🌸 自然',d:3},
+  {jp:'いるか',r:'いるか',m:'海豚（dolphin）',c:'🌸 自然',d:3},
+  {jp:'たいよう',r:'たいよう',m:'太陽（sun）',c:'🌸 自然',d:2},
+  {jp:'かみなり',r:'かみなり',m:'雷（thunder）',c:'🌸 自然',d:3},
+  {jp:'にじ',r:'にじ',m:'虹（rainbow）',c:'🌸 自然',d:1},
+  {jp:'こおり',r:'こおり',m:'氷（ice）',c:'🌸 自然',d:2},
+  {jp:'ふじさん',r:'ふじさん',m:'富士山（Mt. Fuji）',c:'🌸 自然',d:2},
+  {jp:'さかな',r:'さかな',m:'魚（fish）',c:'🌸 自然',d:2},
+  {jp:'すずめ',r:'すずめ',m:'雀（sparrow）',c:'🌸 自然',d:2},
+  {jp:'こうもり',r:'こうもり',m:'蝙蝠（bat）',c:'🌸 自然',d:3},
+  {jp:'わし',r:'わし',m:'鷲（eagle）',c:'🌸 自然',d:1},
+  {jp:'つる',r:'つる',m:'鶴（crane）',c:'🌸 自然',d:1},
+  {jp:'かば',r:'かば',m:'河馬（hippo）',c:'🌸 自然',d:1},
+  {jp:'さい',r:'さい',m:'犀（rhinoceros）',c:'🌸 自然',d:1},
+  {jp:'しか',r:'しか',m:'鹿（deer）',c:'🌸 自然',d:1},
+  {jp:'さる',r:'さる',m:'猿（monkey）',c:'🌸 自然',d:1},
+  {jp:'はと',r:'はと',m:'鳩（pigeon）',c:'🌸 自然',d:1},
+  {jp:'たき',r:'たき',m:'滝（waterfall）',c:'🌸 自然',d:1},
+  {jp:'くも',r:'くも',m:'雲（cloud）',c:'🌸 自然',d:1},
+  {jp:'きり',r:'きり',m:'霧（fog）',c:'🌸 自然',d:1},
+  {jp:'かめ',r:'かめ',m:'亀（turtle）',c:'🌸 自然',d:1},
+  {jp:'へび',r:'へび',m:'蛇（snake）',c:'🌸 自然',d:1},
+  {jp:'いのしし',r:'いのしし',m:'猪（boar）',c:'🌸 自然',d:3},
+  // 🏯 文化・歴史
+  {jp:'かたな',r:'かたな',m:'刀（katana）',c:'🏯 文化',d:2},
+  {jp:'すもう',r:'すもう',m:'相撲（sumo）',c:'🏯 文化',d:2},
+  {jp:'まつり',r:'まつり',m:'祭り（festival）',c:'🏯 文化',d:3},
+  {jp:'きもの',r:'きもの',m:'着物（kimono）',c:'🏯 文化',d:3},
+  {jp:'かぶき',r:'かぶき',m:'歌舞伎（kabuki）',c:'🏯 文化',d:3},
+  {jp:'さどう',r:'さどう',m:'茶道（tea ceremony）',c:'🏯 文化',d:2},
+  {jp:'しょどう',r:'しょどう',m:'書道（calligraphy）',c:'🏯 文化',d:3},
+  {jp:'おりがみ',r:'おりがみ',m:'折り紙（origami）',c:'🏯 文化',d:3},
+  {jp:'たいこ',r:'たいこ',m:'太鼓（drum）',c:'🏯 文化',d:2},
+  {jp:'しゃみせん',r:'しゃみせん',m:'三味線（shamisen）',c:'🏯 文化',d:3},
+  {jp:'さむらい',r:'さむらい',m:'侍（samurai）',c:'🏯 文化',d:3},
+  {jp:'にんじゃ',r:'にんじゃ',m:'忍者（ninja）',c:'🏯 文化',d:3},
+  {jp:'じんじゃ',r:'じんじゃ',m:'神社（shrine）',c:'🏯 文化',d:3},
+  {jp:'おてら',r:'おてら',m:'お寺（temple）',c:'🏯 文化',d:2},
+  {jp:'とりい',r:'とりい',m:'鳥居（torii gate）',c:'🏯 文化',d:3},
+  {jp:'げいしゃ',r:'げいしゃ',m:'芸者（geisha）',c:'🏯 文化',d:3},
+  {jp:'しょうぎ',r:'しょうぎ',m:'将棋（shogi）',c:'🏯 文化',d:3},
+  {jp:'けんどう',r:'けんどう',m:'剣道（kendo）',c:'🏯 文化',d:3},
+  {jp:'からて',r:'からて',m:'空手（karate）',c:'🏯 文化',d:3},
+  {jp:'じゅうどう',r:'じゅうどう',m:'柔道（judo）',c:'🏯 文化',d:3},
+  {jp:'ゆかた',r:'ゆかた',m:'浴衣（summer kimono）',c:'🏯 文化',d:3},
+  {jp:'おんせん',r:'おんせん',m:'温泉（hot spring）',c:'🏯 文化',d:3},
+  {jp:'りょかん',r:'りょかん',m:'旅館（Japanese inn）',c:'🏯 文化',d:3},
+  {jp:'たたみ',r:'たたみ',m:'畳（tatami mat）',c:'🏯 文化',d:3},
+  {jp:'こたつ',r:'こたつ',m:'こたつ（heated table）',c:'🏯 文化',d:3},
+  {jp:'しんかんせん',r:'しんかんせん',m:'新幹線（bullet train）',c:'🏯 文化',d:3},
+  {jp:'はなびたいかい',r:'はなびたいかい',m:'花火大会（fireworks festival）',c:'🏯 文化',d:3},
+  {jp:'おみやげ',r:'おみやげ',m:'お土産（souvenir）',c:'🏯 文化',d:3},
+  {jp:'らくご',r:'らくご',m:'落語（rakugo comedy）',c:'🏯 文化',d:3},
+  {jp:'いただきます',r:'いただきます',m:'いただきます（before eating）',c:'🏯 文化',d:3},
+  {jp:'ごちそうさま',r:'ごちそうさま',m:'ごちそうさま（after eating）',c:'🏯 文化',d:3},
+  {jp:'おかえり',r:'おかえり',m:'おかえり（welcome home）',c:'🏯 文化',d:3},
+  {jp:'まいこ',r:'まいこ',m:'舞妓（maiko）',c:'🏯 文化',d:2},
+  {jp:'のう',r:'のう',m:'能（noh theater）',c:'🏯 文化',d:1},
+  {jp:'いけばな',r:'いけばな',m:'生け花（flower arranging）',c:'🏯 文化',d:3},
+  {jp:'あいきどう',r:'あいきどう',m:'合気道（aikido）',c:'🏯 文化',d:3},
+  {jp:'ふとん',r:'ふとん',m:'布団（futon）',c:'🏯 文化',d:2},
+  {jp:'ざぶとん',r:'ざぶとん',m:'座布団（floor cushion）',c:'🏯 文化',d:3},
+  {jp:'おふろ',r:'おふろ',m:'お風呂（bath）',c:'🏯 文化',d:2},
+  {jp:'おてあらい',r:'おてあらい',m:'お手洗い（restroom）',c:'🏯 文化',d:3},
+  // 🏙️ 日常
+  {jp:'て',r:'て',m:'手（hand）',c:'🏙️ 日常',d:1},
+  {jp:'め',r:'め',m:'目（eye）',c:'🏙️ 日常',d:1},
+  {jp:'ほん',r:'ほん',m:'本（book）',c:'🏙️ 日常',d:1},
+  {jp:'くつ',r:'くつ',m:'靴（shoes）',c:'🏙️ 日常',d:1},
+  {jp:'かさ',r:'かさ',m:'傘（umbrella）',c:'🏙️ 日常',d:1},
+  {jp:'うた',r:'うた',m:'歌（song）',c:'🏙️ 日常',d:1},
+  {jp:'あさ',r:'あさ',m:'朝（morning）',c:'🏙️ 日常',d:1},
+  {jp:'よる',r:'よる',m:'夜（night）',c:'🏙️ 日常',d:1},
+  {jp:'ふね',r:'ふね',m:'船（ship）',c:'🏙️ 日常',d:1},
+  {jp:'えき',r:'えき',m:'駅（station）',c:'🏙️ 日常',d:1},
+  {jp:'きょう',r:'きょう',m:'今日（today）',c:'🏙️ 日常',d:1},
+  {jp:'あした',r:'あした',m:'明日（tomorrow）',c:'🏙️ 日常',d:2},
+  {jp:'きのう',r:'きのう',m:'昨日（yesterday）',c:'🏙️ 日常',d:2},
+  {jp:'でんしゃ',r:'でんしゃ',m:'電車（train）',c:'🏙️ 日常',d:2},
+  {jp:'くるま',r:'くるま',m:'車（car）',c:'🏙️ 日常',d:2},
+  {jp:'でんわ',r:'でんわ',m:'電話（telephone）',c:'🏙️ 日常',d:2},
+  {jp:'めがね',r:'めがね',m:'眼鏡（glasses）',c:'🏙️ 日常',d:2},
+  {jp:'かばん',r:'かばん',m:'鞄（bag）',c:'🏙️ 日常',d:2},
+  {jp:'おかね',r:'おかね',m:'お金（money）',c:'🏙️ 日常',d:2},
+  {jp:'えいが',r:'えいが',m:'映画（movie）',c:'🏙️ 日常',d:2},
+  {jp:'おんがく',r:'おんがく',m:'音楽（music）',c:'🏙️ 日常',d:3},
+  {jp:'ひこうき',r:'ひこうき',m:'飛行機（airplane）',c:'🏙️ 日常',d:3},
+  {jp:'びょういん',r:'びょういん',m:'病院（hospital）',c:'🏙️ 日常',d:3},
+  {jp:'がっこう',r:'がっこう',m:'学校（school）',c:'🏙️ 日常',d:3},
+  {jp:'としょかん',r:'としょかん',m:'図書館（library）',c:'🏙️ 日常',d:3},
+  {jp:'ゆうびんきょく',r:'ゆうびんきょく',m:'郵便局（post office）',c:'🏙️ 日常',d:3},
+  {jp:'ぎんこう',r:'ぎんこう',m:'銀行（bank）',c:'🏙️ 日常',d:3},
+  {jp:'かいもの',r:'かいもの',m:'買い物（shopping）',c:'🏙️ 日常',d:3},
+  {jp:'べんきょう',r:'べんきょう',m:'勉強（study）',c:'🏙️ 日常',d:3},
+  {jp:'りょこう',r:'りょこう',m:'旅行（travel）',c:'🏙️ 日常',d:3},
+  {jp:'じてんしゃ',r:'じてんしゃ',m:'自転車（bicycle）',c:'🏙️ 日常',d:3},
+  {jp:'えんぴつ',r:'えんぴつ',m:'鉛筆（pencil）',c:'🏙️ 日常',d:3},
+  {jp:'けしごむ',r:'けしごむ',m:'消しゴム（eraser）',c:'🏙️ 日常',d:3},
+  {jp:'てぶくろ',r:'てぶくろ',m:'手袋（gloves）',c:'🏙️ 日常',d:3},
+  {jp:'しんぶん',r:'しんぶん',m:'新聞（newspaper）',c:'🏙️ 日常',d:3},
+  {jp:'まいにち',r:'まいにち',m:'毎日（every day）',c:'🏙️ 日常',d:2},
+  {jp:'たんじょうび',r:'たんじょうび',m:'誕生日（birthday）',c:'🏙️ 日常',d:3},
+  {jp:'ねんがじょう',r:'ねんがじょう',m:'年賀状（new year card）',c:'🏙️ 日常',d:3},
+  {jp:'うんどうかい',r:'うんどうかい',m:'運動会（sports day）',c:'🏙️ 日常',d:3},
+  {jp:'くうこう',r:'くうこう',m:'空港（airport）',c:'🏙️ 日常',d:3},
+  {jp:'あたま',r:'あたま',m:'頭（head）',c:'🏙️ 日常',d:2},
+  {jp:'ここのつ',r:'ここのつ',m:'九つ（nine）',c:'🏙️ 日常',d:3},
+  {jp:'ふたり',r:'ふたり',m:'二人（two people）',c:'🏙️ 日常',d:3},
+  {jp:'ひとり',r:'ひとり',m:'一人（one person）',c:'🏙️ 日常',d:2},
+  {jp:'みっつ',r:'みっつ',m:'三つ（three）',c:'🏙️ 日常',d:2},
+  {jp:'とうきょう',r:'とうきょう',m:'東京（Tokyo）',c:'🏙️ 日常',d:3},
+  {jp:'おおさか',r:'おおさか',m:'大阪（Osaka）',c:'🏙️ 日常',d:3},
+  {jp:'きょうと',r:'きょうと',m:'京都（Kyoto）',c:'🏙️ 日常',d:3},
+  {jp:'ほっかいどう',r:'ほっかいどう',m:'北海道（Hokkaido）',c:'🏙️ 日常',d:3},
+  {jp:'おきなわ',r:'おきなわ',m:'沖縄（Okinawa）',c:'🏙️ 日常',d:3},
+  {jp:'こころ',r:'こころ',m:'心（heart/mind）',c:'🏙️ 日常',d:3},
+];
+
+// ===================================================
+//  LONG TEXT DATA (by difficulty 1-3)
+// ===================================================
+const LONG_TEXTS = [
+  // diff 1 (Lv1-3)
+  {title:'おすし屋さん', reading:'おすしやさんにいきました。まぐろとえびとうにをたべました。とてもおいしかったです。', diff:1},
+  {title:'あさのそら', reading:'あさにそとをみるとそらがあおくてきれいでした。とりがとんでいました。', diff:1},
+  {title:'なつのうみ', reading:'なつにうみへいきました。なみがたかくてとてもたのしかったです。', diff:1},
+  {title:'ねこのきもち', reading:'ねこはまいにちにわでひなたぼっこをしています。とてもきもちよさそうです。', diff:1},
+  // diff 2 (Lv4-6)
+  {title:'さくらの季節', reading:'はるになるとさくらがきれいにさきます。はなびらがかぜにふかれてまっています。にほんのはるはとてもうつくしいです。', diff:2},
+  {title:'おまかせ寿司', reading:'おまかせコースではいたまえさんがえらんだしゅんのねたがでてきます。おおとろやうにいくらなどごうかなねたがならびます。', diff:2},
+  {title:'温泉旅行', reading:'りょかんにとまっておんせんにはいりました。ゆあがりにゆかたをきておいしいりょうりをたべました。とてもしあわせなじかんでした。', diff:2},
+  {title:'富士山のぼり', reading:'ふじさんはにほんでいちばんたかいやまです。なつにはたくさんのひとがのぼりにきます。てっぺんからみるごらいこうはさいこうです。', diff:2},
+  // diff 3 (Lv7-10)
+  {title:'江戸前寿司の歴史', reading:'えどまえずしはえどじだいにとうきょうわんでとれたしんせんなさかなをてにぎりでしょくにんがにぎったのがはじまりです。しゃりにはすあじをつけたすめしがつかわれねたとのちょうわがたいせつです。', diff:3},
+  {title:'日本の四季', reading:'にほんにはうつくしいしきがあります。はるにはさくらがさきなつにはみどりがしげりあきにはこうようがうつくしくふゆにはゆきがつもります。しきおりおりのしぜんがにほんのぶんかをはぐくんできました。', diff:3},
+  {title:'侍の生き方', reading:'さむらいはけんどうやじゅうどうなどのぶどうをおさめめいよとちゅうぎをだいじにしていきました。ぶしどうのこころはげんだいのにほんじんのせいしんにもいきています。', diff:3},
+  {title:'新幹線の技術', reading:'しんかんせんはにほんがほこるこうそくてつどうです。さいこうそくどじそくにひゃくごじゅうきろいじょうではしりあんぜんせいもひじょうにたかいです。かいがいでもそのぎじゅつがちゅうもくされています。', diff:3},
+];
+
+// ===================================================
+//  GAME STATE
+// ===================================================
+let selectedLevel = 1;
+let selectedStartMode = 'word';
+let gameMode = 'word'; // 'word' | 'long'
+let gameActive = false;
+
+// word mode
+let currentWord = null, moraseq = [], moraIdx = 0, charIdx = 0;
+// long mode
+let longText = null, longMoras = [], longIdx = 0, longCharIdx = 0;
+
+let score = 0, correctCount = 0, missCount = 0;
+let combo = 0, maxCombo = 0;
+let timeLeft = 60, totalChars = 0, startTime = null;
+let timerInterval = null, wordTimerInt = null;
+let usedWords = [];
+
+const $ = id => document.getElementById(id);
+
+// ===================================================
+//  BUILD START SCREEN
+// ===================================================
+function buildLevelPicker() {
+  const c = $('level-picker');
+  c.innerHTML = '';
+  LEVELS.forEach(lv => {
+    const b = document.createElement('button');
+    b.className = 'lp-btn' + (lv.n === selectedLevel ? ' sel' : '');
+    b.style.borderColor = lv.col;
+    b.style.color = lv.col;
+    if (lv.n === selectedLevel) {
+      b.style.background = lv.col + '22';
+      b.style.boxShadow = `0 0 0 2px ${lv.col}44`;
+    }
+    b.innerHTML = `<div class="lp-n">${lv.icon}</div><div class="lp-tag">Lv.${lv.n} ${lv.name}</div>`;
+    b.onclick = () => { selectedLevel = lv.n; buildLevelPicker(); };
+    c.appendChild(b);
+  });
+}
+buildLevelPicker();
+
+function selectStartMode(m) {
+  selectedStartMode = m;
+  $('smr-word').classList.toggle('sel', m === 'word');
+  $('smr-long').classList.toggle('sel', m === 'long');
+}
+
+function setGameMode(m) {
+  gameMode = m;
+  $('tab-word').classList.toggle('active', m === 'word');
+  $('tab-long').classList.toggle('active', m === 'long');
+  $('word-area').classList.toggle('hidden', m !== 'word');
+  $('long-area').classList.toggle('hidden', m !== 'long');
+}
+
+// ===================================================
+//  LEVEL DISPLAY (fixed - just shows selected level)
+// ===================================================
+function updateLevelUI() {
+  const lv = getLvDef(selectedLevel);
+  $('lv-label').textContent = `Lv.${selectedLevel} ${lv.name}`;
+  $('lv-fill').style.width = (selectedLevel / 10 * 100) + '%';
+  $('lv-fill').style.background = `linear-gradient(90deg, ${lv.col}88, ${lv.col})`;
+  $('lv-badge').textContent = lv.icon;
+  $('lv-badge').style.background = lv.col;
+  const wordLen = `単語 ${lv.minLen}〜${lv.maxLen === 99 ? '∞' : lv.maxLen}文字`;
+  $('lv-next').textContent = wordLen;
+}
+
+// ===================================================
+//  ROMAJI RENDER
+// ===================================================
+function buildRomajiSpans(moras, curMora, curChar, container, cls='rc') {
+  container.innerHTML = '';
+  for (let mi = 0; mi < moras.length; mi++) {
+    const m = moras[mi];
+    // ん: 次のモーラに応じて n か nn を表示
+    let p = m.p[0];
+    if (m.sn) {
+      const next = moras[mi+1];
+      const nf = next ? next.p[0][0] : '';
+      p = 'aiueoyn'.includes(nf) ? 'nn' : 'n';
+    }
+    for (let ci = 0; ci < p.length; ci++) {
+      const s = document.createElement('span');
+      s.className = cls;
+      if (mi < curMora) s.classList.add('typed','done');
+      else if (mi === curMora && ci < curChar) s.classList.add('typed','done');
+      else if (mi === curMora && ci === curChar) s.classList.add('cur','act');
+      else s.classList.add('rem','todo');
+      s.textContent = p[ci];
+      container.appendChild(s);
+    }
+    if (cls === 'lrc') {
+      const sp = document.createElement('span');
+      sp.className = cls + ' todo';
+      sp.textContent = '';
+      container.appendChild(sp);
+    }
+  }
+}
+
+// ===================================================
+//  WORD MODE
+// ===================================================
+function getWordPool() {
+  const lv = getLvDef(selectedLevel);
+  return WORDS.filter(w => {
+    const len = w.r.length;
+    return len >= lv.minLen && len <= lv.maxLen;
+  });
+}
+
+function loadWord() {
+  clearInterval(wordTimerInt);
+  const pool = getWordPool();
+  const avail = pool.filter(w => !usedWords.includes(w.jp));
+  if (avail.length === 0) usedWords = [];
+  currentWord = avail.length ? avail[Math.floor(Math.random()*avail.length)] : pool[Math.floor(Math.random()*pool.length)];
+  usedWords.push(currentWord.jp);
+
+  moraseq = kanaToMoras(currentWord.r);
+  moraIdx = 0; charIdx = 0;
+
+  $('jp-word').textContent = currentWord.jp;
+  $('word-meaning').textContent = currentWord.m;
+  $('ws-cat').textContent = currentWord.c;
+  const lv = getLvDef(selectedLevel);
+  $('ws-lv-tag').textContent = `Lv.${selectedLevel}`;
+  $('ws-lv-tag').style.background = lv.col;
+  renderWordRomaji();
+
+  // Word timer (Lv4+)
+  if (lv.wordTimer && gameMode === 'word') {
+    const len = moraseq.reduce((a,m)=>a+m.p[0].length,0);
+    const mult = lv.timerMult || 1.0;
+    let wt = Math.max(2.0, (len * 0.8 + 2.0) * mult);
+    $('wtimer-track').classList.remove('hidden');
+    $('wtimer-fill').style.transition = 'none';
+    $('wtimer-fill').style.width = '100%';
+    const col = mult <= 0.6 ? '#e74c3c' : mult <= 0.8 ? '#e67e22' : '#27ae60';
+    $('wtimer-fill').style.background = col;
+    const step = 100 / (wt * 10);
+    let pct = 100;
+    setTimeout(() => { $('wtimer-fill').style.transition = 'width .1s linear'; }, 30);
+    wordTimerInt = setInterval(() => {
+      pct -= step;
+      $('wtimer-fill').style.width = Math.max(0,pct) + '%';
+      if (pct <= 30) $('wtimer-fill').style.background = '#e74c3c';
+      if (pct <= 0) {
+        clearInterval(wordTimerInt);
+        combo = 0; updateCombo();
+        showFeedback('タイムアウト！','#e74c3c');
+        loadWord();
+      }
+    }, 100);
+  } else {
+    $('wtimer-track').classList.add('hidden');
+  }
+}
+
+function renderWordRomaji() {
+  buildRomajiSpans(moraseq, moraIdx, charIdx, $('romaji-line'));
+  const total = moraseq.reduce((a,m)=>a+m.p[0].length,0);
+  const done = moraseq.slice(0,moraIdx).reduce((a,m)=>a+m.p[0].length,0) + charIdx;
+  $('prog-fill').style.width = (done/total*100) + '%';
+
+  // Hint
+  const lv = getLvDef(selectedLevel);
+  if (lv.showHint && moraIdx < moraseq.length) {
+    const mora = moraseq[moraIdx];
+    if (mora.p.length > 1) {
+      const alts = mora.p.slice(1).map(p=>`<b>${p}</b>`).join('・');
+      $('hint-text').innerHTML = `他: ${alts}`;
+    } else { $('hint-text').innerHTML = ''; }
+  } else { $('hint-text').innerHTML = ''; }
+}
+
+// ===================================================
+//  LONG MODE
+// ===================================================
+function loadLongText() {
+  const lv = getLvDef(selectedLevel);
+  const pool = LONG_TEXTS.filter(t => t.diff <= lv.longDiff);
+  longText = pool[Math.floor(Math.random()*pool.length)];
+  longMoras = kanaToMoras(longText.reading);
+  longIdx = 0; longCharIdx = 0;
+  $('long-title-txt').textContent = longText.title;
+  $('long-badge').textContent = `Lv.${selectedLevel}`;
+  $('long-badge').style.background = lv.col;
+  renderLong();
+}
+
+function renderLong() {
+  // Paragraph (kana)
+  const pd = $('para-display');
+  pd.innerHTML = '';
+  let mi = 0;
+  for (let k = 0; k < longText.reading.length; k++) {
+    const ch = longText.reading[k];
+    const span = document.createElement('span');
+    span.className = 'pc';
+    span.textContent = ch;
+    // figure out if this kana is done/active/todo by mora index
+    // We count kana chars mapped to moras
+    if (mi < longIdx) span.classList.add('done');
+    else if (mi === longIdx) span.classList.add('act');
+    else span.classList.add('todo');
+    if (ch === ' ' || ch === '　') span.classList.add('space');
+    pd.appendChild(span);
+    mi++;
+  }
+  // Scroll active char into view
+  const act = pd.querySelector('.act');
+  if (act) act.scrollIntoView({block:'nearest', behavior:'smooth'});
+
+  // Romaji line — show current + upcoming
+  buildRomajiSpans(longMoras, longIdx, longCharIdx, $('long-romaji'), 'lrc');
+
+  // Progress
+  const total = longMoras.reduce((a,m)=>a+m.p[0].length,0);
+  const done = longMoras.slice(0,longIdx).reduce((a,m)=>a+m.p[0].length,0) + longCharIdx;
+  $('long-prog-fill').style.width = (done/total*100) + '%';
+}
+
+// ===================================================
+//  CORE INPUT
+// ===================================================
+function handleChar(ch) {
+  if (!gameActive) return;
+  ch = ch.toLowerCase();
+  if (gameMode === 'word') handleWordChar(ch);
+  else handleLongChar(ch);
+}
+
+function tryMora(moras, mIdx, cIdx, ch) {
+  const mora = moras[mIdx];
+  if (!mora) return null;
+
+  // ── ん の特殊処理 ──
+  if (mora.sn) {
+    if (ch === 'n') {
+      if (cIdx === 0) {
+        // 1打目のn: 次のモーラ頭文字を見る
+        const next = moras[mIdx+1];
+        const nf = next ? next.p[0][0] : '';
+        if (!'aiueoyn'.includes(nf)) {
+          // 単独nで即確定（次が子音 or 末尾）
+          return {ok:true, advance:true, newCIdx:0};
+        }
+        // 次が母音/n/yなら1打目nは受け付けてcIdx=1へ（nn待ち）
+        return {ok:true, advance:false, newCIdx:1};
+      }
+      if (cIdx === 1) {
+        // 2打目のn → nn確定
+        return {ok:true, advance:true, newCIdx:0};
+      }
+    }
+    return {ok:false};
+  }
+
+  // ── 通常パターンマッチ ──
+  for (let pi = 0; pi < mora.p.length; pi++) {
+    const pat = mora.p[pi];
+    if (cIdx < pat.length && pat[cIdx] === ch) {
+      if (pi > 0) { mora.p.splice(pi,1); mora.p.unshift(pat); }
+      const newCIdx = cIdx + 1;
+      const advance = newCIdx >= mora.p[0].length;
+      return {ok:true, advance, newCIdx: advance ? 0 : newCIdx};
+    }
+  }
+  return {ok:false};
+}
+
+function handleWordChar(ch) {
+  if (moraIdx >= moraseq.length) return;
+  const res = tryMora(moraseq, moraIdx, charIdx, ch);
+  if (!res) return;
+  if (res.ok) {
+    totalChars++;
+    flashStage('ok-flash');
+    if (res.advance) {
+      moraIdx++;
+      charIdx = 0;
+      if (moraIdx >= moraseq.length) wordComplete();
+      else renderWordRomaji();
+    } else {
+      charIdx = res.newCIdx;
+      renderWordRomaji();
+    }
+  } else {
+    missCount++;
+    combo = 0; updateCombo();
+    $('miss').textContent = missCount;
+    flashStage('err');
+  }
+}
+
+function wordComplete() {
+  clearInterval(wordTimerInt);
+  combo++;
+  if (combo > maxCombo) maxCombo = combo;
+  const wordLen = moraseq.reduce((a,m)=>a+m.p[0].length,0);
+  const comboBonus = Math.min(combo,10) * 8;
+  let pts = wordLen * 12 + comboBonus;
+  if (selectedLevel >= 7) pts = Math.round(pts * 1.4);
+  else if (selectedLevel >= 4) pts = Math.round(pts * 1.2);
+  score += pts;
+  correctCount++;
+  $('score').textContent = score;
+  $('correct').textContent = correctCount;
+  $('wpm').textContent = calcKPS();
+  $('accuracy').textContent = calcAccuracy()+'%';
+  updateCombo();
+  const msg = combo>=8?`+${pts} 🔥×${combo}!!!`:combo>=5?`+${pts} ⚡×${combo}`:combo>=3?`+${pts} ✨×${combo}`:`+${pts}`;
+  const col = combo>=8?'#e67e22':combo>=5?'#8e44ad':combo>=3?'#2980b9':'#27ae60';
+  showFeedback(msg, col);
+  loadWord();
+}
+
+function handleLongChar(ch) {
+  if (longIdx >= longMoras.length) return;
+  const res = tryMora(longMoras, longIdx, longCharIdx, ch);
+  if (!res) return;
+  if (res.ok) {
+    totalChars++;
+    flashStage('ok-flash');
+    if (res.advance) {
+      longIdx++;
+      longCharIdx = 0;
+      if (longIdx >= longMoras.length) {
+        longComplete();
+        return;
+      }
+    } else {
+      longCharIdx = res.newCIdx;
+    }
+    renderLong();
+    const pts = 5 + (selectedLevel >= 7 ? 4 : selectedLevel >= 4 ? 2 : 0);
+    score += pts;
+    $('score').textContent = score;
+    $('wpm').textContent = calcKPS();
+  } else {
+    missCount++;
+    $('miss').textContent = missCount;
+    flashStage('err');
+  }
+}
+
+function longComplete() {
+  const bonus = 200 + selectedLevel * 50;
+  score += bonus;
+  correctCount++;
+  $('score').textContent = score;
+  $('correct').textContent = correctCount;
+  showFeedback(`🎉 文章完成！ +${bonus}`, '#d4ac0d');
+  setTimeout(() => { if (gameActive) loadLongText(); }, 800);
+}
+
+// ===================================================
+//  COMBO / FEEDBACK
+// ===================================================
+function updateCombo() {
+  const w = $('combo-wrap');
+  if (combo >= 2) {
+    w.style.display = 'block';
+    $('combo-n').textContent = combo + 'x';
+    $('combo-n').style.animation = 'none';
+    void $('combo-n').offsetHeight;
+    $('combo-n').style.animation = 'cp .25s ease';
+  } else { w.style.display = 'none'; }
+}
+
+function showFeedback(txt, col) {
+  const f = document.createElement('div');
+  f.className = 'fb'; f.textContent = txt; f.style.color = col;
+  $('input-wrap').appendChild(f);
+  setTimeout(()=>f.remove(), 620);
+}
+
+function flashStage(type) {
+  const el = gameMode === 'word' ? $('word-stage') : document.querySelector('.long-stage');
+  if (!el) return;
+  el.classList.remove('err','ok-flash');
+  void el.offsetHeight;
+  el.classList.add(type);
+  setTimeout(()=>el.classList.remove(type), type==='err'?220:80);
+}
+
+function calcKPS() {
+  if (!startTime) return '0.0';
+  const elapsed = Math.max((Date.now()-startTime)/1000, 0.1);
+  return (totalChars / elapsed).toFixed(1);
+}
+function calcAccuracy() {
+  const t = totalChars + missCount;
+  return t ? Math.round(totalChars/t*100) : 100;
+}
+
+// ===================================================
+//  NORMALIZATION: 全角→半角、ひらがな/カタカナ直接入力対応
+// ===================================================
+// 全角英数字→半角
+function normZenkaku(s) {
+  return s.replace(/[Ａ-Ｚａ-ｚ０-９]/g, c =>
+    String.fromCharCode(c.charCodeAt(0) - 0xFEE0)
+  ).toLowerCase();
+}
+
+// カタカナ→ひらがな
+function kata2hira(s) {
+  return s.replace(/[\u30A1-\u30F6]/g, c =>
+    String.fromCharCode(c.charCodeAt(0) - 0x60)
+  );
+}
+
+// 入力文字を処理する統一エントリ
+// 日本語直接入力(ひらがな/カタカナ)の場合は現在のモーラのかなと比較
+function dispatchInput(raw) {
+  if (!gameActive || !raw) return;
+
+  // 全角英数→半角英数
+  const normalized = normZenkaku(raw);
+
+  for (const ch of normalized) {
+    const code = ch.charCodeAt(0);
+
+    // ひらがな (U+3041–U+3096) またはカタカナ(U+30A1–U+30F6)
+    const hira = kata2hira(ch);
+    if (/[\u3041-\u3096]/.test(hira)) {
+      handleKanaDirect(hira);
+      continue;
+    }
+
+    // 長音符
+    if (ch === 'ー' || ch === 'ｰ') { handleChar('-'); continue; }
+
+    // 通常文字(半角英数・記号)
+    if (ch.length === 1) handleChar(ch);
+  }
+}
+
+// ひらがな直接入力: 現在のモーラのかなと一致すれば一発で進める
+function handleKanaDirect(hira) {
+  if (gameMode === 'word') {
+    if (moraIdx >= moraseq.length) return;
+    const mora = moraseq[moraIdx];
+    if (mora.k === hira) {
+      // 1モーラ分まとめて正解
+      const len = mora.p[0].length;
+      totalChars += len;
+      flashStage('ok-flash');
+      moraIdx++;
+      charIdx = 0;
+      if (moraIdx >= moraseq.length) wordComplete();
+      else renderWordRomaji();
+    } else {
+      // かなが違う = ミス
+      missCount++;
+      combo = 0; updateCombo();
+      $('miss').textContent = missCount;
+      flashStage('err');
+    }
+  } else {
+    if (longIdx >= longMoras.length) return;
+    const mora = longMoras[longIdx];
+    if (mora.k === hira) {
+      const len = mora.p[0].length;
+      totalChars += len;
+      flashStage('ok-flash');
+      longIdx++;
+      longCharIdx = 0;
+      if (longIdx >= longMoras.length) { longComplete(); return; }
+      renderLong();
+      const pts = 5 + (selectedLevel >= 7 ? 4 : selectedLevel >= 4 ? 2 : 0);
+      score += pts * len;
+      $('score').textContent = score;
+      $('wpm').textContent = calcKPS();
+    } else {
+      missCount++;
+      $('miss').textContent = missCount;
+      flashStage('err');
+    }
+  }
+}
+
+// ===================================================
+//  GAME FLOW
+//  inputフィールド不使用・document keydownで直接受け取り
+//  → IME変換ウィンドウが絶対に出ない
+// ===================================================
+
+function codeToChar(e) {
+  if (e.ctrlKey || e.metaKey || e.altKey) return null;
+  if (e.code === 'Minus') return '-';
+  if (e.code === 'Period') return '.';   // . と ．(全角) どちらも Period キー
+  if (e.code === 'Comma')  return ',';
+  const m = e.code.match(/^Key([A-Z])$/);
+  if (m) return m[1].toLowerCase();
+  // e.codeで取れないキー(全角記号など)はe.keyで拾う
+  if (e.key === '．' || e.key === '。') return '.';
+  if (e.key === '、' || e.key === '，') return ',';
+  return null;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (gameActive) {
+      clearInterval(timerInterval);
+      clearInterval(wordTimerInt);
+      gameActive = false;
+      buildLevelPicker();
+      $('start-overlay').classList.remove('hidden');
+    }
+    e.preventDefault(); return;
+  }
+  if (!gameActive) return;
+
+  if (e.code === 'Enter') {
+    if (gameMode === 'word') { combo = 0; updateCombo(); clearInterval(wordTimerInt); loadWord(); }
+    e.preventDefault(); return;
+  }
+
+  const ch = codeToChar(e);
+  if (ch !== null) {
+    e.preventDefault(); // IME起動・ブラウザデフォルト動作を完全ブロック
+    handleChar(ch);
+  }
+});
+
+document.addEventListener('click', () => {});
+
+function startGame() {
+  $('start-overlay').classList.add('hidden');
+  gameMode = selectedStartMode;
+  setGameMode(gameMode);
+  gameActive = true;
+
+  score = 0; correctCount = 0; missCount = 0;
+  combo = 0; maxCombo = 0; totalChars = 0;
+  usedWords = [];
+
+  const lv = getLvDef(selectedLevel);
+  timeLeft = lv.timeLimit;
+
+  ['score','correct','miss','wpm'].forEach(id => $(id).textContent = '0');
+  $('accuracy').textContent = '-';
+  $('timer').textContent = timeLeft;
+  $('timer').style.color = '#fff';
+  $('timer').classList.remove('danger');
+  $('combo-wrap').style.display = 'none';
+  startTime = Date.now();
+  updateLevelUI();
+
+  if (gameMode === 'word') loadWord();
+  else loadLongText();
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    $('timer').textContent = timeLeft;
+    if (timeLeft <= 10) { $('timer').style.color = '#e74c3c'; $('timer').classList.add('danger'); }
+    if (timeLeft <= 0) endGame();
+  }, 1000);
+}
+
+function endGame() {
+  clearInterval(timerInterval);
+  clearInterval(wordTimerInt);
+  gameActive = false;
+
+  const lv = getLvDef(selectedLevel);
+  const s = score;
+  let rank, title;
+  if (s >= 5000)      { rank='👑 伝説の名人'; title='完璧です！'; }
+  else if (s >= 3000) { rank='🏆 一流の職人'; title='素晴らしい！'; }
+  else if (s >= 1500) { rank='⭐ 上達しました'; title='よくできました！'; }
+  else if (s >= 600)  { rank='🍣 一人前'; title='お疲れ様！'; }
+  else if (s >= 200)  { rank='🐟 まだまだ'; title='もう少し！'; }
+  else                { rank='🌱 入門者'; title='練習しよう！'; }
+
+  $('r-title').textContent = title;
+  $('r-rank').textContent = `${rank}　[Lv.${selectedLevel} ${lv.name}/${gameMode==='long'?'長文':'単語'}]`;
+  $('r-score').textContent = s;
+  $('r-correct').textContent = correctCount;
+  $('r-chars').textContent = totalChars;
+  $('r-wpm').textContent = calcKPS();
+  $('r-acc').textContent = calcAccuracy()+'%';
+  $('r-combo').textContent = maxCombo;
+  $('result-overlay').classList.remove('hidden');
+}
+
+function resetGame() {
+  $('result-overlay').classList.add('hidden');
+  startGame();
+}
+function goStart() {
+  $('result-overlay').classList.add('hidden');
+  buildLevelPicker();
+  $('start-overlay').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
